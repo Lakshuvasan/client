@@ -5,12 +5,19 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  role: text("role").notNull().default("user"), // "user" or "admin"
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const chatSessions = pgTable("chat_sessions", {
   id: serial("id").primaryKey(),
   sessionId: text("session_id").notNull().unique(),
+  userId: integer("user_id").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -39,11 +46,26 @@ export const certifications = pgTable("certifications", {
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
+  email: true,
   password: true,
+  role: true,
+  firstName: true,
+  lastName: true,
+});
+
+export const loginUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export const registerUserSchema = insertUserSchema.extend({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email("Invalid email address"),
 });
 
 export const insertChatSessionSchema = createInsertSchema(chatSessions).pick({
   sessionId: true,
+  userId: true,
 });
 
 export const insertChatMessageSchema = createInsertSchema(chatMessages).pick({

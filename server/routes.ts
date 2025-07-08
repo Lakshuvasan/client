@@ -6,6 +6,16 @@ import { insertChatSessionSchema, insertChatMessageSchema, chatResponseSchema } 
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import "./data/certifications"; // Initialize certifications
+import { 
+  registerUser, 
+  loginUser, 
+  getCurrentUser, 
+  authenticateToken, 
+  requireAdmin,
+  optionalAuth,
+  initializeDefaultAccounts,
+  type AuthenticatedRequest 
+} from "./auth";
 
 const sendMessageSchema = z.object({
   message: z.string().min(1).max(1000),
@@ -13,11 +23,31 @@ const sendMessageSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Create or get chat session
-  app.post("/api/chat/session", async (req, res) => {
+  // Initialize default accounts
+  await initializeDefaultAccounts();
+
+  // Authentication routes
+  app.post("/api/auth/register", registerUser);
+  app.post("/api/auth/login", loginUser);
+  app.get("/api/auth/user", authenticateToken, getCurrentUser);
+
+  // Get all users (admin only)
+  app.get("/api/admin/users", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      // This would require extending storage to get all users
+      res.json({ message: "Admin access working - user list endpoint" });
+    } catch (error) {
+      console.error("Get users error:", error);
+      res.status(500).json({ message: "Failed to get users" });
+    }
+  });
+
+  // Create or get chat session (optional authentication)
+  app.post("/api/chat/session", optionalAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const sessionId = nanoid();
-      const session = await storage.createChatSession({ sessionId });
+      const userId = req.user?.id || null; // Optional user association
+      const session = await storage.createChatSession({ sessionId, userId });
       res.json({ sessionId: session.sessionId });
     } catch (error) {
       console.error("Session creation error:", error);

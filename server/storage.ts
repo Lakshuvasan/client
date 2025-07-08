@@ -9,10 +9,12 @@ import {
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
   createChatSession(session: InsertChatSession): Promise<ChatSession>;
   getChatSession(sessionId: string): Promise<ChatSession | undefined>;
+  getUserSessions(userId: number): Promise<ChatSession[]>;
   
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   getChatMessages(sessionId: string): Promise<ChatMessage[]>;
@@ -60,9 +62,23 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id,
+      role: insertUser.role || "user",
+      firstName: insertUser.firstName || null,
+      lastName: insertUser.lastName || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
     this.users.set(id, user);
     return user;
   }
@@ -72,11 +88,18 @@ export class MemStorage implements IStorage {
     const session: ChatSession = { 
       ...insertSession, 
       id,
+      userId: insertSession.userId || null,
       createdAt: new Date()
     };
     this.chatSessions.set(insertSession.sessionId, session);
     this.chatMessages.set(insertSession.sessionId, []);
     return session;
+  }
+
+  async getUserSessions(userId: number): Promise<ChatSession[]> {
+    return Array.from(this.chatSessions.values()).filter(
+      session => session.userId === userId
+    );
   }
 
   async getChatSession(sessionId: string): Promise<ChatSession | undefined> {

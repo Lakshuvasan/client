@@ -24,32 +24,45 @@ CERTI-BOT is a modern web application built as an AI-powered certification assis
 
 ### Database Design
 The application uses PostgreSQL with the following schema:
-- **users**: User authentication and profiles
-- **chat_sessions**: Individual chat conversation tracking
+- **users**: User authentication and profiles with role-based access
+- **chat_sessions**: Individual chat conversation tracking with optional user association
 - **chat_messages**: Message history with metadata
 - **certifications**: Comprehensive certification database with categorization
 
 ## Key Components
 
+### Authentication System
+- JWT-based user authentication with secure token management
+- User registration and login with email/password
+- Role-based access control (User and Admin roles)
+- Default accounts: admin@certibot.com/admin123, user@certibot.com/user123
+- Optional authentication for chat sessions (guests can use without accounts)
+- Secure password hashing with bcryptjs
+
 ### Chat System
 - Real-time conversation interface with typing indicators
-- Message persistence across sessions
+- Message persistence across sessions with optional user association
 - AI-powered responses with certification recommendations
 - Interactive suggestion cards for quick user engagement
+- Session management tied to user accounts when authenticated
 
 ### Certification Database
 - Pre-populated with popular certifications across multiple domains
 - Categories include cloud computing, cybersecurity, project management, and data science
 - Rich metadata including difficulty levels, prep time, costs, and provider information
+- 15+ certifications covering major technology domains
 
 ### AI Integration
 - OpenAI GPT-4o integration for natural language processing
 - Contextual certification recommendations based on user queries
 - Relevance scoring system for recommendation ranking
 - Chat history consideration for personalized responses
+- Graceful fallback when AI service is unavailable
 
 ### UI/UX Features
 - Responsive design with mobile-first approach
+- User authentication UI with login/register pages
+- User profile dropdown with role indicators
 - Dark/light theme support through CSS variables
 - Animated components and smooth transitions
 - Accessible design following modern standards
@@ -115,5 +128,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Changelog
 
-Changelog:
-- July 08, 2025. Initial setup
+Recent Changes:
+- July 08, 2025. Added user authentication system with JWT tokens
+- July 08, 2025. Implemented user registration and login pages
+- July 08, 2025. Added role-based access control (User/Admin roles)
+- July 08, 2025. Created default demo accounts for testing
+- July 08, 2025. Updated chat header with user profile dropdown
+- July 08, 2025. Enhanced API client to automatically include auth tokens
+- July 08, 2025. Modified chat sessions to optionally associate with users
+- July 08, 2025. Initial project setup and CERTI-BOT chatbot implementation
