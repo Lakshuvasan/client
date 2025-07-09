@@ -71,13 +71,17 @@ export function ChatHeader() {
                       <DropdownMenuSeparator />
                     </>
                   )}
-                  <DropdownMenuItem>
-                    <i className="fas fa-user mr-2"></i>
-                    Profile
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">
+                      <i className="fas fa-user mr-2"></i>
+                      Profile
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <i className="fas fa-history mr-2"></i>
-                    Chat History
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">
+                      <i className="fas fa-cog mr-2"></i>
+                      Settings
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
