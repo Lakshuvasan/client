@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import logoImage from "@assets/logo_1752088433660.jpg";
 
 export function ChatHeader() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -27,13 +28,11 @@ export function ChatHeader() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <i className="fas fa-robot text-white text-lg"></i>
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold text-slate-800">CERTI-BOT</h1>
-              <p className="text-sm text-secondary">Intelligent Certification Assistant</p>
-            </div>
+            <img 
+              src={logoImage} 
+              alt="CERTI-BOT" 
+              className="h-12 w-auto object-contain"
+            />
           </div>
           
           <div className="flex items-center space-x-4">
