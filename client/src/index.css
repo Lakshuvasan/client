@@ -54,39 +54,7 @@
   --gray-600: hsl(0, 0%, 45%);
 }
 
-.dark {
-  --background: hsl(240, 10%, 3.9%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(240, 3.7%, 15.9%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(142, 76%, 36%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
-  --radius: 0.5rem;
-  
-  /* CERTI-BOT specific dark colors */
-  --surface: hsl(240, 10%, 3.9%);
-  --background-light: hsl(240, 10%, 3.9%);
-  --slate-50: hsl(240, 3.7%, 15.9%);
-  --slate-100: hsl(240, 3.7%, 20%);
-  --slate-200: hsl(240, 3.7%, 25%);
-  --slate-300: hsl(240, 3.7%, 35%);
-  --slate-500: hsl(240, 5%, 64.9%);
-  --slate-600: hsl(240, 5%, 74.9%);
-  --slate-800: hsl(0, 0%, 98%);
-}
+
 
 @layer base {
   * {

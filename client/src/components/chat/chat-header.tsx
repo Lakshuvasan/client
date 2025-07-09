@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export function ChatHeader() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -38,8 +37,6 @@ export function ChatHeader() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <ThemeToggle />
-            
             {isAuthenticated && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
