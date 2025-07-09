@@ -101,15 +101,6 @@ export default function LandingPage() {
               <Link href="/login">Try Demo Account</Link>
             </Button>
           </div>
-          
-          {/* Demo Credentials */}
-          <div className="mt-8 p-4 bg-slate-50 rounded-lg max-w-md mx-auto">
-            <p className="text-sm text-slate-600 mb-2">Quick Demo Access:</p>
-            <div className="text-xs text-slate-500 space-y-1">
-              <div>👨‍💼 Admin: admin@certibot.com / admin123</div>
-              <div>👤 User: user@certibot.com / user123</div>
-            </div>
-          </div>
         </div>
       </section>
 
