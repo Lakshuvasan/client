@@ -18,9 +18,11 @@ export function ChatHeader() {
   const handleLogout = () => {
     logout();
     toast({
-      title: "Logged Out",
+      title: "Logged Out", 
       description: "You have been successfully logged out.",
     });
+    // Redirect to landing page after logout
+    window.location.href = "/";
   };
 
   return (
