@@ -11,8 +11,7 @@ import {
   Users, 
   Shield, 
   ArrowRight,
-  CheckCircle,
-  Star
+  CheckCircle
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -48,26 +47,7 @@ export default function LandingPage() {
     { name: "Scrum Master", category: "Agile", difficulty: "Beginner" }
   ];
 
-  const testimonials = [
-    {
-      name: "Sarah Chen",
-      role: "Software Engineer",
-      content: "CERTI-BOT helped me find the perfect cloud certification for my career transition. The AI recommendations were spot-on!",
-      rating: 5
-    },
-    {
-      name: "Michael Rodriguez",
-      role: "IT Manager",
-      content: "As someone managing a team, CERTI-BOT helps me understand which certifications my team members should pursue.",
-      rating: 5
-    },
-    {
-      name: "Emily Johnson",
-      role: "Recent Graduate",
-      content: "I was overwhelmed by certification options. CERTI-BOT made it simple to understand what's right for my career level.",
-      rating: 5
-    }
-  ];
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -202,42 +182,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">
-              What Our Users Say
-            </h2>
-            <p className="text-lg text-slate-600">
-              Join thousands of professionals who've found their certification path with CERTI-BOT.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <div className="flex space-x-1 mb-2">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <CardDescription className="text-base">
-                    "{testimonial.content}"
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div>
-                    <p className="font-medium text-slate-800">{testimonial.name}</p>
-                    <p className="text-sm text-slate-600">{testimonial.role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* CTA Section */}
       <section className="py-20">
