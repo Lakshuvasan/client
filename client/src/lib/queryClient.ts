@@ -1,5 +1,8 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// ✅ Define your FastAPI backend base URL
+const API_BASE_URL = "http://127.0.0.1:8000";
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -9,19 +12,21 @@ async function throwIfResNotOk(res: Response) {
 
 export async function apiRequest(
   method: string,
-  url: string,
+  url: string, // this is now treated as a path, like "/auth/login"
   data?: unknown | undefined,
   additionalHeaders?: Record<string, string>
 ): Promise<Response> {
   const token = localStorage.getItem("authToken");
-  
+
   const headers: Record<string, string> = {
     ...(data ? { "Content-Type": "application/json" } : {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(additionalHeaders || {}),
   };
 
-  const res = await fetch(url, {
+  const fullUrl = `${API_BASE_URL}${url}`; // ✅ prepend base URL
+
+  const res = await fetch(fullUrl, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
@@ -33,12 +38,16 @@ export async function apiRequest(
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
+
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    const path = queryKey[0] as string;
+    const fullUrl = `${API_BASE_URL}${path}`; // ✅ prepend base URL
+
+    const res = await fetch(fullUrl, {
       credentials: "include",
     });
 

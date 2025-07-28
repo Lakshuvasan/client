@@ -9,11 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Settings, Bell, Shield, Trash2, Download } from "lucide-react";
+import { useTheme } from "@/theme-provider";
+import { ArrowLeft, Settings, Bell, Shield, Trash2, Download, Moon, Sun } from "lucide-react";
 
 export default function SettingsPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState({
     notifications: {
       email: true,
@@ -254,6 +256,33 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Theme</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Select your preferred theme
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant={theme === 'light' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setTheme('light')}
+                  >
+                    <Sun className="h-4 w-4 mr-2" />
+                    Light
+                  </Button>
+                  <Button
+                    variant={theme === 'dark' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setTheme('dark')}
+                  >
+                    <Moon className="h-4 w-4 mr-2" />
+                    Dark
+                  </Button>
+                </div>
+              </div>
+              <Separator />
               <div className="space-y-2">
                 <Label>Language</Label>
                 <Select value={settings.preferences.language} onValueChange={(value) => handlePreferenceChange('language', value)}>

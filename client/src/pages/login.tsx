@@ -1,37 +1,36 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import logoImage from "@assets/logo_1752088433660.jpg";
+// client/src/pages/Login.tsx
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
-export default function LoginPage() {
+export function LoginPage() {
   const [, setLocation] = useLocation();
-  const { login, isLoading } = useAuth();
+  const { login, loading } = useAuth();
   const { toast } = useToast();
+  
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
-      await login(formData.email, formData.password);
+    const result = await login(formData);
+    
+    if (result.success) {
       toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
+        title: 'Success',
+        description: 'Logged in successfully!',
       });
-      setLocation("/");
-    } catch (error: any) {
+      setLocation('/chat');
+    } else {
       toast({
-        title: "Login Failed",
-        description: error.message || "Invalid email or password.",
-        variant: "destructive",
+        title: 'Error',
+        description: result.error || 'Login failed',
+        variant: 'destructive',
       });
     }
   };
@@ -39,77 +38,75 @@ export default function LoginPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <img 
-              src={logoImage} 
-              alt="CERTI-BOT" 
-              className="h-16 w-auto object-contain"
-            />
-          </div>
-          <CardTitle className="text-2xl">Welcome Back</CardTitle>
-          <CardDescription>
-            Sign in to your CERTI-BOT account to continue your certification journey.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sign in to CERTI-BOT
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Or{' '}
+            <Link href="/register">
+              <a className="font-medium text-primary hover:text-primary/80">
+                create a new account
+              </a>
+            </Link>
+          </p>
+        </div>
+        
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
+              <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Enter your email"
+                autoComplete="email"
+                required
                 value={formData.email}
                 onChange={handleChange}
-                required
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                placeholder="Email address"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
+            
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <input
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Enter your password"
+                autoComplete="current-password"
+                required
                 value={formData.password}
                 onChange={handleChange}
-                required
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                placeholder="Password"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing In..." : "Sign In"}
-            </Button>
-          </form>
-          
-          <div className="mt-6 space-y-4">
-            <div className="text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link href="/register" className="text-primary hover:underline">
-                Sign up
-              </Link>
-            </div>
-            
-            <div className="border-t pt-4">
-              <p className="text-xs text-muted-foreground text-center">
-                Demo accounts for testing:
-              </p>
-              <div className="text-xs text-muted-foreground text-center mt-2 space-y-1">
-                <div>Admin: admin@certibot.com / admin123</div>
-                <div>User: user@certibot.com / user123</div>
-              </div>
-            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <div>
+            <Button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              disabled={loading}
+            >
+              {loading ? 'Signing in...' : 'Sign in'}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

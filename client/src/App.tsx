@@ -3,19 +3,19 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/theme-provider";
 import { useAuth } from "@/hooks/useAuth";
 import LandingPage from "@/pages/landing";
-import ChatPage from "@/pages/chat";
-import LoginPage from "@/pages/login";
-import RegisterPage from "@/pages/register";
+import { ChatPage } from "@/pages/chat";
+import {LoginPage} from "@/pages/login";
+import { RegisterPage } from "@/pages/register";
 import ProfilePage from "@/pages/profile";
 import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -44,12 +44,16 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
 
 export default App;
+
+

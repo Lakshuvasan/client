@@ -1,214 +1,212 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+// client/src/pages/RegisterPage.tsx
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
-export default function RegisterPage() {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  
-  const { register } = useAuth();
+export function RegisterPage() {
   const [, setLocation] = useLocation();
+  const { register, loading } = useAuth();
   const { toast } = useToast();
+  
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    interests: [] as string[],
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
+  const interestOptions = [
+    'Cloud Computing',
+    'Cybersecurity',
+    'Data Science',
+    'Project Management',
+    'Software Development',
+    'DevOps',
+    'Business Analytics',
+    'Machine Learning',
+    'Network Administration',
+    'Database Management',
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
-    if (!formData.username || !formData.email || !formData.password) {
-      setError("Please fill in all required fields");
-      return;
-    }
-
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      return;
-    }
-
-    setIsLoading(true);
-    setError("");
-
-    try {
-      await register({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        firstName: formData.firstName || undefined,
-        lastName: formData.lastName || undefined,
-      });
-      
       toast({
-        title: "Registration Successful",
-        description: "Welcome to CERTI-BOT! Your account has been created.",
+        title: 'Error',
+        description: 'Passwords do not match',
+        variant: 'destructive',
       });
-      setLocation("/");
-    } catch (error: any) {
-      setError(error.message || "Registration failed");
-    } finally {
-      setIsLoading(false);
+      return;
+    }
+
+    if (formData.interests.length === 0) {
+      toast({
+        title: 'Error',
+        description: 'Please select at least one interest',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const result = await register({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      interests: formData.interests,
+    });
+    
+    if (result.success) {
+      toast({
+        title: 'Success',
+        description: 'Account created successfully!',
+      });
+      setLocation('/chat');
+    } else {
+      toast({
+        title: 'Error',
+        description: result.error || 'Registration failed',
+        variant: 'destructive',
+      });
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleInterestChange = (interest: string) => {
+    setFormData(prev => ({
+      ...prev,
+      interests: prev.interests.includes(interest)
+        ? prev.interests.filter(i => i !== interest)
+        : [...prev.interests, interest].slice(0, 3) // Max 3 interests
+    }));
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background-light px-4 py-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <i className="fas fa-graduation-cap text-white text-2xl"></i>
-          </div>
-          <CardTitle className="text-2xl">Create Account</CardTitle>
-          <CardDescription>
-            Join CERTI-BOT to get personalized certification recommendations
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            
-            <div className="space-y-2">
-              <Label htmlFor="username">Username *</Label>
-              <Input
-                id="username"
-                name="username"
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Create your account
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Or{' '}
+            <Link href="/login">
+              <a className="font-medium text-primary hover:text-primary/80">
+                sign in to your existing account
+              </a>
+            </Link>
+          </p>
+        </div>
+        
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <input
+                id="name"
+                name="name"
                 type="text"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Enter username"
-                disabled={isLoading}
                 required
+                value={formData.name}
+                onChange={handleChange}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                placeholder="John Doe"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
+              <input
                 id="email"
                 name="email"
                 type="email"
+                autoComplete="email"
+                required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Enter your email"
-                disabled={isLoading}
-                required
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                placeholder="john@example.com"
               />
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="First name"
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Last name"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="password">Password *</Label>
-              <Input
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <input
                 id="password"
                 name="password"
                 type="password"
+                autoComplete="new-password"
+                required
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Enter password (min 6 characters)"
-                disabled={isLoading}
-                required
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                placeholder="Password"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password *</Label>
-              <Input
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Confirm Password
+              </label>
+              <input
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
+                required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder="Confirm your password"
-                disabled={isLoading}
-                required
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                placeholder="Confirm Password"
               />
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={isLoading}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Interests (Select up to 3)
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {interestOptions.map((interest) => (
+                  <label key={interest} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.interests.includes(interest)}
+                      onChange={() => handleInterestChange(interest)}
+                      disabled={!formData.interests.includes(interest) && formData.interests.length >= 3}
+                      className="mr-2 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm text-gray-700">{interest}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <Button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              disabled={loading}
             >
-              {isLoading ? (
-                <>
-                  <i className="fas fa-spinner fa-spin mr-2"></i>
-                  Creating Account...
-                </>
-              ) : (
-                "Create Account"
-              )}
+              {loading ? 'Creating account...' : 'Create account'}
             </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-secondary">
-              Already have an account?{" "}
-              <Link href="/login" className="text-primary hover:underline">
-                Sign in
-              </Link>
-            </p>
           </div>
-
-          <div className="mt-4 text-center">
-            <Link href="/" className="text-sm text-secondary hover:text-primary">
-              Continue as Guest
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+        </form>
+      </div>
     </div>
   );
 }
