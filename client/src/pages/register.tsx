@@ -52,10 +52,19 @@ export function RegisterPage() {
       return;
     }
 
+    if (formData.interests.length > 3) {
+      toast({
+        title: 'Error',
+        description: 'Please select up to 3 interests only',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const result = await register({
-      name: formData.name,
       email: formData.email,
       password: formData.password,
+      name: formData.name,
       interests: formData.interests,
     });
     
@@ -152,10 +161,11 @@ export function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 required
+                minLength={6}
                 value={formData.password}
                 onChange={handleChange}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                placeholder="Password"
+                placeholder="Password (min 6 characters)"
               />
             </div>
 
@@ -193,6 +203,9 @@ export function RegisterPage() {
                   </label>
                 ))}
               </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Selected: {formData.interests.length}/3
+              </p>
             </div>
           </div>
 

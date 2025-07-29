@@ -40,14 +40,14 @@ api.interceptors.response.use(
 export interface User {
   id: string;
   email: string;
-  name: string;
+  name?: string;
   interests: string[];
 }
 
 export interface UserCreateData {
   email: string;
   password: string;
-  name: string;
+  name?: string;
   interests: string[];
 }
 
@@ -77,7 +77,7 @@ export interface ChatRequest {
 // Auth Services
 export const authService = {
   async register(userData: UserCreateData): Promise<AuthResponse> {
-    const response = await api.post('/users/register', userData);
+    const response = await api.post('/api/users/register', userData);
     
     // Store token if provided
     if (response.data.access_token) {
@@ -88,15 +88,9 @@ export const authService = {
   },
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // FastAPI typically expects form data for login
-    const formData = new FormData();
-    formData.append('username', credentials.email); // FastAPI often uses 'username' field
-    formData.append('password', credentials.password);
-
-    const response = await api.post('/auth/login', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+    const response = await api.post('/api/auth/login', {
+      email: credentials.email,
+      password: credentials.password,
     });
     
     // Store token
@@ -116,7 +110,7 @@ export const authService = {
   },
 
   async getCurrentUser(): Promise<User> {
-    const response = await api.get('/users/me');
+    const response = await api.get('/api/auth/me');
     return response.data;
   },
 };
@@ -130,7 +124,7 @@ export const chatService = {
       formData.append('message', chatRequest.message);
       formData.append('file', chatRequest.file);
 
-      const response = await api.post('/chat/', formData, {
+      const response = await api.post('/api/chat/session', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -138,9 +132,10 @@ export const chatService = {
       
       return response.data;
     } else {
-      // Send text message only
-      const response = await api.post('/chat/', {
-        message: chatRequest.message,
+      // Send text message only - updated to match your backend
+      const response = await api.post('/api/chat/session', {
+        content: chatRequest.message,
+         "timestamp": new Date().toISOString(),
       });
       
       return response.data;
@@ -148,7 +143,7 @@ export const chatService = {
   },
 
   async getChatHistory(): Promise<ChatMessage[]> {
-    const response = await api.get('/chat/history');
+    const response = await api.get('/api/chat/history');
     return response.data;
   },
 
@@ -156,7 +151,7 @@ export const chatService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await api.post('/chat/upload', formData, {
+    const response = await api.post('/api/chat/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

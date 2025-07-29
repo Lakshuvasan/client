@@ -36,7 +36,7 @@ export const useAuth = () => {
       
       return { success: true };
     } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Login failed';
+      const errorMessage = err.response?.data?.detail || err.response?.data?.message || 'Login failed';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -54,7 +54,7 @@ export const useAuth = () => {
       
       return { success: true };
     } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Registration failed';
+      const errorMessage = err.response?.data?.detail || err.response?.data?.message || 'Registration failed';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
