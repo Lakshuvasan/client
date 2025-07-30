@@ -1,18 +1,18 @@
 // client/src/lib/api.ts
-import axios from 'axios';
+import axios from "axios";
 
 // Create axios instance pointing to your FastAPI backend
 export const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000',
+  baseURL: "http://127.0.0.1:8000",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 // Add token to requests automatically
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,8 +29,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token expired or invalid
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
@@ -77,86 +77,92 @@ export interface ChatRequest {
 // Auth Services
 export const authService = {
   async register(userData: UserCreateData): Promise<AuthResponse> {
-    const response = await api.post('/api/users/register', userData);
-    
+    const response = await api.post("/api/users/register", userData);
+
     // Store token if provided
     if (response.data.access_token) {
-      localStorage.setItem('token', response.data.access_token);
+      localStorage.setItem("token", response.data.access_token);
     }
-    
+
     return response.data;
   },
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await api.post('/api/auth/login', {
+    const response = await api.post("/api/auth/login", {
       email: credentials.email,
       password: credentials.password,
     });
-    
+
     // Store token
     if (response.data.access_token) {
-      localStorage.setItem('token', response.data.access_token);
+      localStorage.setItem("token", response.data.access_token);
     }
-    
+
     return response.data;
   },
 
   logout(): void {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
   },
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
+    return !!localStorage.getItem("token");
   },
 
   async getCurrentUser(): Promise<User> {
-    const response = await api.get('/api/auth/me');
+    const response = await api.get("/api/auth/me");
     return response.data;
   },
 };
 
 // Chat Services
+// chatService inside api.ts
 export const chatService = {
-  async sendMessage(chatRequest: ChatRequest): Promise<any> {
+  async sendMessage(
+    chatRequest: ChatRequest
+  ): Promise<{ content: string; timestamp: string }> {
     if (chatRequest.file) {
-      // Send file with message
       const formData = new FormData();
-      formData.append('message', chatRequest.message);
-      formData.append('file', chatRequest.file);
+      formData.append("message", chatRequest.message);
+      formData.append("file", chatRequest.file);
 
-      const response = await api.post('/api/chat/session', formData, {
+      const response = await api.post("/api/chat/session", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-      
+
       return response.data;
     } else {
-      // Send text message only - updated to match your backend
-      const response = await api.post('/api/chat/session', {
+      const response = await api.post("/api/chat/session", {
         content: chatRequest.message,
-         "timestamp": new Date().toISOString(),
+        timestamp: new Date().toISOString(),
       });
-      
+
       return response.data;
     }
   },
 
-  async getChatHistory(): Promise<ChatMessage[]> {
-    const response = await api.get('/api/chat/history');
+  async getChatHistory(): Promise<{
+    id: string;
+    user_id: string;
+    createdAt: string;
+    messages: { content: string; sender: string; timestamp: string }[];
+  }> {
+    const response = await api.get("/api/chat/session");
     return response.data;
   },
 
   async uploadPDF(file: File): Promise<{ message: string }> {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
-    const response = await api.post('/api/chat/upload', formData, {
+    const response = await api.post("/api/chat/upload", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
-    
+
     return response.data;
   },
 };

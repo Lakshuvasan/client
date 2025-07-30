@@ -1,10 +1,10 @@
 // client/src/hooks/useChat.ts
-import { useState, useCallback } from 'react';
-import { chatService, type ChatRequest } from '@/lib/api';
+import { useState, useCallback } from "react";
+import { chatService, type ChatRequest } from "@/lib/api";
 
 interface Message {
   id: string;
-  sender: 'user' | 'bot';
+  sender: "user" | "bot";
   content: string;
   timestamp: Date;
   metadata?: {
@@ -22,91 +22,45 @@ export const useChat = () => {
   const sendMessage = useCallback(async (messageText: string, file?: File) => {
     try {
       setError(null);
-      
-      // Add user message immediately
+
       const userMessage: Message = {
-        id: Date.now() + '-user',
-        sender: 'user',
+        id: Date.now() + "-user",
+        sender: "user",
         content: messageText,
         timestamp: new Date(),
       };
-      
-      setMessages(prev => [...prev, userMessage]);
+
+      setMessages((prev) => [...prev, userMessage]);
       setIsTyping(true);
 
-      // Send to FastAPI backend
-      const chatRequest: ChatRequest = {
-        message: messageText,
-        file: file,
-      };
-
+      const chatRequest: ChatRequest = { message: messageText, file };
       const response = await chatService.sendMessage(chatRequest);
-      
-      // Update session ID if provided
-      if (response.sessionId && !sessionId) {
-        setSessionId(response.sessionId);
-      }
-      
-      // Add bot response
+
       const botMessage: Message = {
-        id: Date.now() + '-bot',
-        sender: 'bot',
-        content: response.message,
-        timestamp: new Date(),
-        metadata: {
-          certifications: response.certifications || [],
-          category: response.category,
-        },
+        id: Date.now() + "-bot",
+        sender: "bot",
+        content: response.content,
+        timestamp: new Date(response.timestamp),
+        metadata: {},
       };
 
-      setMessages(prev => [...prev, botMessage]);
-      
+      setMessages((prev) => [...prev, botMessage]);
     } catch (err: any) {
-      console.error('Chat error:', err);
-      const errorMessage = err.response?.data?.detail || err.response?.data?.message || 'Failed to send message';
-      setError(errorMessage);
-      
-      // Add error message
-      const errorBotMessage: Message = {
-        id: Date.now() + '-error',
-        sender: 'bot',
-        content: 'I apologize, but I encountered an error. Please try again.',
-        timestamp: new Date(),
-      };
-      
-      setMessages(prev => [...prev, errorBotMessage]);
+      console.error("Chat error:", err);
+      setError(err.response?.data?.detail || "Failed to send message");
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + "-error",
+          sender: "bot",
+          content: "I apologize, but I encountered an error. Please try again.",
+          timestamp: new Date(),
+        },
+      ]);
     } finally {
       setIsTyping(false);
     }
-  }, [sessionId]);
-
-  const loadChatHistory = useCallback(async () => {
-    try {
-      if (!sessionId) return;
-      
-      const history = await chatService.getChatHistory();
-      
-      // Convert API response to Message format
-      const convertedMessages: Message[] = history.map(item => [
-        {
-          id: `${item.id}-user`,
-          sender: 'user' as const,
-          content: item.message,
-          timestamp: new Date(item.timestamp),
-        },
-        {
-          id: `${item.id}-bot`,
-          sender: 'bot' as const,
-          content: item.response,
-          timestamp: new Date(item.timestamp),
-        }
-      ]).flat();
-      
-      setMessages(convertedMessages);
-    } catch (err) {
-      console.error('Failed to load chat history:', err);
-    }
-  }, [sessionId]);
+  }, []);
 
   const uploadFile = useCallback(async (file: File) => {
     try {
@@ -114,7 +68,10 @@ export const useChat = () => {
       const response = await chatService.uploadPDF(file);
       return { success: true, message: response.message };
     } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || err.response?.data?.message || 'Failed to upload file';
+      const errorMessage =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Failed to upload file";
       setError(errorMessage);
       return { success: false, error: errorMessage };
     }
@@ -131,7 +88,6 @@ export const useChat = () => {
     isTyping,
     error,
     sendMessage,
-    loadChatHistory,
     uploadFile,
     clearMessages,
   };

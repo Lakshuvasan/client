@@ -6,7 +6,11 @@ interface ChatInputProps {
   isTyping: boolean;
 }
 
-export function ChatInput({ onSendMessage, disabled, isTyping }: ChatInputProps) {
+export function ChatInput({
+  onSendMessage,
+  disabled,
+  isTyping,
+}: ChatInputProps) {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -15,13 +19,13 @@ export function ChatInput({ onSendMessage, disabled, isTyping }: ChatInputProps)
       onSendMessage(message);
       setMessage("");
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = "auto";
       }
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -29,11 +33,12 @@ export function ChatInput({ onSendMessage, disabled, isTyping }: ChatInputProps)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
-    
+
     // Auto-resize textarea
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px';
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        Math.min(textareaRef.current.scrollHeight, 120) + "px";
     }
   };
 
@@ -43,7 +48,7 @@ export function ChatInput({ onSendMessage, disabled, isTyping }: ChatInputProps)
     <footer className="bg-surface border-t border-slate-200 sticky bottom-0">
       <div className="max-w-4xl mx-auto p-4">
         <div className="flex items-end space-x-3">
-          <div className="flex-1 relative">
+          <div className="flex-1 relative ">
             <textarea
               ref={textareaRef}
               value={message}
@@ -51,7 +56,7 @@ export function ChatInput({ onSendMessage, disabled, isTyping }: ChatInputProps)
               onKeyDown={handleKeyPress}
               placeholder="Ask me about any certification program..."
               rows={1}
-              className="chat-input w-full resize-none rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 pr-12 text-slate-800 placeholder-slate-500 focus:border-primary focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+              className="chat-input bg-white w-full resize-none rounded-2xl border border-slate-300 px-4 py-3 pr-12 text-slate-800 placeholder-slate-500 focus:border-primary focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
               disabled={disabled}
             />
             <button
@@ -65,7 +70,8 @@ export function ChatInput({ onSendMessage, disabled, isTyping }: ChatInputProps)
         </div>
         <div className="mt-2 text-center">
           <p className="text-xs text-secondary">
-            CERTI-BOT can make mistakes. Please verify important certification information.
+            CERTI-BOT can make mistakes. Please verify important certification
+            information.
           </p>
         </div>
       </div>
